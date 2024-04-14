@@ -6,7 +6,7 @@ def getTasks():
     Tasks = []
     dirs = os.listdir('./lists')
 
-    if dirs != []:
+    if dirs:
         for dir in dirs:
             Tasks.append(dir)
 
@@ -14,10 +14,17 @@ def getTasks():
 
 
 # func that takes in a taskname and status and creates a task based on those
-def addTaskToList(taskName, taskStatus):
+def addTaskToList(taskName, taskStatus, taskDescription):
     if taskName and taskStatus:
-        with open(f'./lists/{taskName}.txt', 'w') as f:
-            f.write(f'Task: {taskName} - Status: {taskStatus}')
+        files = os.listdir('./lists')
+        length = len(files)
+        taskName = f'(#{length + 1})-{taskName}'
+
+        with open(f'./lists/{taskName}.task', 'w') as f:
+            f.write(f'Task: {taskName} - Status: {taskStatus} \n')
+            if taskDescription:
+                f.write(f'Description: {taskDescription}')
+        print(f'Task {taskName} added.')
     else:
         if taskName == '':
             print('Taskname is not supplied')
@@ -29,14 +36,19 @@ def addTaskToList(taskName, taskStatus):
 
 def permDeleteTask(taskName):
     if taskName:
-        os.delete(f'./lists/{taskName}.txt')
+        if os.path.exists(f'./lists/{taskName}.task'):
+            os.remove(f'./lists/{taskName}.task')
+            print(f'Task {taskName} deleted.')
+        else:
+            print('Task does not exist.')
 
 
 # func to get details of a specefied task. Takes in the taskname and returns the contents.
 def getTaskDetails(taskName):
     details = []
-    with open(f'./lists/{taskName}') as lines:
+    with open(f'./lists/{taskName}.task') as lines:
+
         for line in lines:
-            details.append(line)
+            details.append(line.strip('\n'))
 
     return details

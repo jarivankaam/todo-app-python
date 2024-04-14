@@ -1,67 +1,52 @@
 import os
 import sys
-import argparse 
+import argparse
 from convience_functions import getTasks, addTaskToList, permDeleteTask, getTaskDetails
 
-# place for args. use parser. and add if statements in main func.
 
+def main(arguments):
+    # Check if any specific action is requested
+    action_taken = False
 
-# call parser
-parser = argparse.ArgumentParser()
+    if arguments.list:
+        tasks = getTasks()
+        for item in tasks:
+            print(f'Task: {item}')
+        action_taken = True
 
+    if arguments.all:
+        print('Showing all tasks.')
+        action_taken = True
 
-# add url argument
-parser.add_argument(
-    "--name",
-    "-name",
-    default="test",
-    help="name of the task",
-    type=str,
-    required=False,
-)
-# add password argument
-parser.add_argument(
-    "--status",
-    "-s",
-    default="pending",
-    help="task status",
-    type=str,
-    nargs="?",
-    const="hallo",
-    required=False,
-)
-parser.add_argument(
-    "--all",
-    "-a",
-    help="all tasks",
-    nargs="?",
-    required=False,
-)
-parser.add_argument(
-    "--details",
-    "-d",
-    help="detail of task",
-    nargs="?",
-    required=False,
-)
+    if arguments.mode:
+        if arguments.mode == 'create':
+            addTaskToList(arguments.name, arguments.status, arguments.desc)
+            action_taken = True
+        if arguments.mode == 'delete':
+            permDeleteTask(arguments.name)
+            action_taken = True
+        if arguments.mode == 'details':
+            details = getTaskDetails(arguments.name)
+            print(details)
+            action_taken = True
 
+    # Failsafe: if no specific action is requested, default to listing tasks
+    if not action_taken:
+        print("No specific action requested. Defaulting to listing tasks.")
+        tasks = getTasks()
+        for item in tasks:
+            print(f'Task: {item}')
 
-
-
-def main(args):
-    if args == '':
-        print('geen args')
-    else: 
-        lists = getTasks()
-        for item in lists:
-            print(f'Task: {item} \n')
-    
-    if args.all:
-        print('all')
-
-    if args.details and args.name:
-        d = getTaskDetails(args.name)
-        print(d)
 
 if __name__ == '__main__':
-    main(parser.parse_args())
+    parser = argparse.ArgumentParser(description="Task Manager")
+    parser.add_argument('--list', action='store_true', help='List all tasks')
+    parser.add_argument('--all', action='store_true', help='Process all tasks')
+    parser.add_argument('--details', action='store_true', help='Show details of a task')
+    parser.add_argument('--name', type=str, help='Name of the task to detail')
+    parser.add_argument('--desc', type=str, help='desc of the task to detail')
+    parser.add_argument('--status', type=str, help='status of the task to detail')
+    parser.add_argument('--mode', help='create task')
+
+    args = parser.parse_args()
+    main(args)

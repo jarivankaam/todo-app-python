@@ -1,1 +1,0 @@
-Task: Make todo app - Status: pending
